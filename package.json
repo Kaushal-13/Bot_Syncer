@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "debug": "ls -R /app"
+    "debug": "ls -R /app",
+    "run": "node scripts/getLatestBlock.js"
   },
   "keywords": [],
   "author": "",
