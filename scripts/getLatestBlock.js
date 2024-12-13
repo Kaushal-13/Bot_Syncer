@@ -19,7 +19,7 @@ export async function getLatestBlock() {
 }
 
 
-setInterval(getLatestBlock, 600000);
+setInterval(getLatestBlock, 60000);
 
 // Call it once immediately when the script starts
 getLatestBlock();
