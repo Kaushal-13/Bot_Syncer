@@ -58,5 +58,70 @@ Before running the bot, ensure that you have the following installed:
    ```bash
    pnpm run run
    ```
-```
 
+
+## Design Considerations
+
+### 1. **Event Querying with Block Numbers**
+   - **Why Block Numbers?** 
+     The bot uses the block number to track events sequentially. This approach ensures the bot processes events in the correct order. By using block numbers in `queryFilter`, it avoids processing events out of order and skips over already processed ones.
+   - **How It Works:**
+     - The bot tracks the last processed block number stored in MongoDB.
+     - On each query, it starts from the last block number, ensuring no events are missed or reprocessed.
+     - This design helps to ensure that the bot only queries for new `Ping()` events, making it both resource-efficient and accurate.
+
+### 2. **Rate Limiting for Efficiency**
+   - **Why Rate Limiting?** 
+     Constant polling for events could overload both the bot and the blockchain node, leading to wasted resources. Instead, the bot queries every 10 minutes.
+   - **How It Works:**
+     - The bot checks for `Ping()` events at regular intervals (every 10 minutes), using a cron job to manage the polling frequency.
+     - This reduces the load on both the bot and the Sepolia node by limiting unnecessary requests.
+     - Querying by the latest block also ensures the bot doesn’t recheck already processed events, improving efficiency.
+
+### 3. **Transaction Management and Nonce Handling**
+   - **Why Nonce Management?**
+     Ethereum transactions must have a unique nonce to avoid conflicts. This becomes important when sending multiple transactions in parallel or retrying failed transactions.
+   - **How It Works:**
+     - The bot uses a **Nonce Manager** to ensure that each transaction is sent with the correct nonce, even when retrying failed transactions.
+     - When a `pong()` transaction fails due to a high gas price or other reasons, the bot stores it in MongoDB and retries it with an increased gas limit by 10%.
+     - Before retrying a transaction, the bot checks if the transaction has already been mined, further reducing unnecessary retries and saving gas.
+
+### 4. **Persistent Data Storage with MongoDB**
+   - **Why MongoDB?**
+     MongoDB provides a flexible and efficient way to track and store the status of `Ping()` events and `pong()` transactions. It allows the bot to maintain state across restarts and failures, ensuring no data is lost.
+   - **How It Works:**
+     - Every `Ping()` event is saved in the database with an initial status of "Pending."
+     - After the `pong()` transaction is successfully completed, the status is updated to "Done."
+     - Failed transactions are stored with their details (including the nonce) and retried if necessary.
+     - This structure allows the bot to pick up from where it left off after a restart or failure, ensuring smooth operation even in failure scenarios.
+
+### 5. **Efficient Querying with Query Filters**
+   - **Why Query Filters?**
+     Using `queryFilter` ensures the bot only fetches relevant events, and avoids the overhead of listening to every new event. Query filters allow you to specify the exact criteria for the events you need.
+   - **How It Works:**
+     - The bot uses `queryFilter` to listen for `Ping()` events, starting from the last processed block number and querying only for new events.
+     - By specifying the latest block number, the bot ensures it doesn’t recheck events it has already processed, making it highly efficient.
+     - Additionally, the bot can increase the gas limit when a transaction fails, providing better control over failed transactions.
+
+### 6. **Error Handling and Fault Tolerance**
+   - **Why Error Handling?**
+     Network failures, rate limits, or gas spikes are common issues when interacting with blockchain networks. The bot is designed to handle these gracefully.
+   - **How It Works:**
+     - The bot uses robust error handling for failed transactions and retries them automatically with a higher gas price.
+     - It tracks failed transactions in MongoDB to prevent losing them due to temporary issues like network congestion or rate limits.
+     - Before retrying any failed transaction, the bot checks if the transaction has already been mined to avoid unnecessary retries and wasting gas.
+
+### 7. **Scalability and Future Improvements**
+   - **What’s Next?**
+     The current design is built with scalability in mind, but further improvements could include:
+     - **Dynamic Polling Intervals:** Adjusting the polling frequency based on network load or the volume of events.
+     - **Parallel Processing:** Sending multiple `pong()` transactions concurrently with careful management of nonces.
+     - **API Integrations:** Adding APIs for external services to monitor or manage the bot’s operations.
+
+## Conclusion
+The Ping-Pong bot is a robust solution for interacting with the Sepolia testnet’s `PingPong` smart contract. It is designed to be:
+   - **Efficient** through block number-based querying and rate limiting.
+   - **Fault-tolerant** with MongoDB storage for persistence and automatic retries for failed transactions.
+   - **Scalable** with features like nonce management and efficient querying for high throughput.
+
+This design ensures that the bot operates reliably under various conditions, providing a seamless and efficient solution for processing `Ping()` and `pong()` events.
