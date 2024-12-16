@@ -16,7 +16,7 @@ Before running the bot, ensure that you have the following installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone [<repository-url>](https://github.com/Kaushal-13/Bot_Syncer.git)
+   git clone https://github.com/Kaushal-13/Bot_Syncer.git
    cd Bot_Syncer
 
 2. **Install dependencies:**
