@@ -12,9 +12,11 @@ const contractBytecode = contractArtifact.bytecode;
 
 
 const contractAddress = process.env.CONTRACT_ADDRESS
+const INFURA_URL = process.env.INFURA_URL
+
 
 async function main() {
-    const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+    const provider = new ethers.JsonRpcProvider(INFURA_URL);
     const wallet = new ethers.Wallet(privateKey, provider);
     const signer = new ethers.NonceManager(wallet);
     // console.log(signer);
@@ -34,7 +36,8 @@ async function main() {
                 console.log("Nonce", tx.nonce);
                 console.log("Gas Limit", tx.gasLimit)
 
-                const rec = await tx.wait();  // Wait for the transaction to be mined
+                const rec = await tx.wait();
+                console.log("Ping Event Generated with ", tx.hash); // Wait for the transaction to be mined
                 // console.log("Ping event generated!", rec);// Delay in milliseconds (3 seconds)
             } catch (err) {
                 console.error("Error generating Ping event:", err);

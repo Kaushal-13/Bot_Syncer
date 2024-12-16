@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import fs from "fs";
 import { ethers } from "ethers";
-import { initializeDb, sendPong, getPendingPings, restartDb, fetchPing } from "./functions_imp.js";
+import { initializeDb, sendPong, getPendingPings, restartDb, fetchPing, fetchLatest } from "./functions_imp.js";
 import readlineSync from 'readline-sync';
 
 
@@ -17,39 +17,59 @@ const contractArtifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
 const contractABI = contractArtifact.abi;
 const contractBytecode = contractArtifact.bytecode;
 
-
+const INFURA_URL = process.env.INFURA_URL
 const contractAddress = process.env.CONTRACT_ADDRESS
 
 async function main() {
-    const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+    const provider = new ethers.JsonRpcProvider(INFURA_URL);
     const wallet = new ethers.Wallet(privateKey, provider);
     const signer = new ethers.NonceManager(wallet);
     // console.log(signer);
     const pingPongContract = new ethers.Contract(contractAddress, contractABI, signer);
     const db = await initializeDb();
-
-    while (true) {
-        const input = readlineSync.question("Input: ").trim().toLowerCase();
-        console.log(input);
-        if (input === 'mine') {
-            console.log("Starting To mine Blocks");
-            try {
-                await getPendingPings(pingPongContract, 0, db);
-            } catch (err) {
-                console.error("Error generating Ping event:", err);
-            }
+    // const input = readlineSync.question("Input: ").trim().toLowerCase();
+    // console.log(input);
+    const input = "iter";
+    if (input === 'mine') {
+        console.log("Starting To mine Blocks");
+        try {
+            await getPendingPings(pingPongContract, 0, db);
+        } catch (err) {
+            console.error("Error generating Ping event:", err);
         }
-        else if (input === 'sendpong') {
-            const data = await fetchPing(db);
-            console.log(data);
+    }
+    else if (input === 'sendpong') {
+        const data = await fetchPing(db);
+        console.log(data);
+        if (data) {
             await sendPong(pingPongContract, data, db);
         }
-        else if (input === 'restart') {
-            await restartDb(db);
+    }
+    else if (input === 'restart') {
+        await restartDb(db);
+    }
+    else if (input === 'getlatestdone') {
+        const rec = await fetchLatest(db);
+        console.log(rec)
+    }
+    else if (input === 'iter') {
+        const latestBlock = await fetchLatest(db);
+        console.log(latestBlock)
+        await getPendingPings(pingPongContract, Number(latestBlock) + 1, db);
+
+        const num_iters = 3;
+        for (let i = 0; i < num_iters; i++) {
+            const data = await fetchPing(db);
+            if (data) {
+                await sendPong(pingPongContract, data, db);
+            }
+            else {
+                break;
+            }
         }
-        else {
-            console.log("Invalid input. Type 'ping' to trigger the Ping event.");
-        }
+    }
+    else {
+        console.log("Invalid input. Type 'ping' to trigger the Ping event.");
     }
     // Original Idea
     // pingPongContract.on("Ping", async (event) => {
@@ -77,7 +97,7 @@ async function main() {
     // });
 }
 
-main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-});
+
+
+main().catch(err => console.error("Error in immediate execution:", err));
+//  This is for cron job.

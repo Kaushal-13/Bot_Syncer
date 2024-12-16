@@ -7,9 +7,9 @@ const artifactPath = './artifacts/contracts/PingPong.sol/PingPong.json'
 const contractArtifact = JSON.parse(fs.readFileSync(artifactPath, "utf8"));
 const contractABI = contractArtifact.abi;
 const contractBytecode = contractArtifact.bytecode;
+const INFURA_URL = process.env.INFURA_URL
 async function main() {
-    const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
-    console.log(provider)
+    const provider = new ethers.JsonRpcProvider(INFURA_URL);
     const deployer = new ethers.Wallet(privateKey, provider);
 
     const contractFactory = new ethers.ContractFactory(contractABI, contractBytecode, deployer);
