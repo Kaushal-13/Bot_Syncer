@@ -16,30 +16,47 @@ Before running the bot, ensure that you have the following installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
-   cd <repository-folder>
-Install dependencies:
+   git clone [<repository-url>](https://github.com/Kaushal-13/Bot_Syncer.git)
+   cd Bot_Syncer
 
-bash
-Copy code
-pnpm install
-Create a .env file: Copy the .env.example to .env and fill in the required values:
+2. **Install dependencies:**
+   ```bash
+   pnpm install
+   ```
 
-PRIVATE_KEY: Your private key to sign transactions.
-INFURA_URL: Your Infura URL to connect to Sepolia.
-CONTRACT_ADDRESS: The address of the deployed Ping-Pong contract.
-Set up MongoDB: Ensure your MongoDB instance is running. This bot stores the state of the pong() transactions in MongoDB for persistence.
+3. **Create a `.env` file:**
+   
+   - `PRIVATE_KEY`: Your private key to sign transactions.
+   - `INFURA_URL`: Your Infura URL to connect to Sepolia.
+   - `CONTRACT_ADDRESS`: The address of the deployed Ping-Pong contract.
+   - `MONGO_URI` : To connect with the mongodb database.
+   - `BLOCK_NUMBER`: To store the beginning block number default to 0 for testing on a local network.
 
-Running the Bot Locally
-Start a local blockchain for testing: Use npx hardhat node to spin up a local testnet. This is useful for local development and testing.
+4. **Set up MongoDB:**
+   Ensure your MongoDB instance is running. This bot stores the state of the `pong()` transactions in MongoDB for persistence.
 
-Deploy the smart contract: Deploy the Ping-Pong contract using the following script:
+### Running the Bot Locally
 
-bash
-Copy code
-node scripts/PingPong.js
-Emit a Ping event: Run the following script to emit Ping() events:
+1. **Start a local blockchain for testing:**
+   Use `npx hardhat node` to spin up a local testnet. This is useful for local development and testing.
+2. **Compile the Smart Contract**
+   Use `npx hardhat compile` to compile the smart contracts.
+4. **Deploy the smart contract:**
+   Deploy the Ping-Pong contract using the following script:
+   ```bash
+   node scripts/PingPong.js
+   ```
 
-bash
-Copy code
-node scripts/pinger.js
+5. **Emit a Ping event:**
+   Run the following script to emit `Ping()` events:
+   ```bash
+   node scripts/pinger.js
+   ```
+
+6. **Run the bot:**
+   To start the bot and have it listen for `Ping()` events and call `pong()`
+   ```bash
+   pnpm run run
+   ```
+```
+
