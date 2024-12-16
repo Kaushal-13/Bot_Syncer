@@ -37,7 +37,7 @@ async function updateDb(data, db) {
             const result = await collection.updateOne(
                 { _id: data._id },
                 { $set: { "status": "done" } });
-            console.log(result)
+            // console.log(result)
         } catch (error) {
             console.error(error)
         }
@@ -51,7 +51,7 @@ export async function sendPong(contract, data, db) {
     const nonce = data.nonce;
     const blockNumber = data.blockNumber;
     try {
-        console.log("Data is ", data)
+        // console.log("Data is ", data)
         if (data) {
             if ("pongId" in data) {
                 const rec = await provider.getTransactionReceipt(data.pongId);
@@ -79,7 +79,7 @@ export async function sendPong(contract, data, db) {
     finally {
 
         if ((tx && !receipt) || (receipt && receipt.status === 0)) {
-            console.log(tx);
+            // console.log(tx);
             // add tx to the storage with the following stuff.
             const data = {
                 "_id": txHash,
@@ -147,7 +147,7 @@ export async function fetchLatest(db) {
         const collection = db.collection('Ping_Events')
         const document = await collection.findOne(query, { sort: { blockNumber: -1 } });
         const data = document
-        console.log(data);
+        // console.log(data);
         if (data && "blockNumber" in data) {
             return data.blockNumber;
         }

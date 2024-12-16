@@ -54,7 +54,8 @@ async function main() {
     }
     else if (input === 'iter') {
         const latestBlock = await fetchLatest(db);
-        console.log(latestBlock)
+        // 
+        // console.log(latestBlock)
         await getPendingPings(pingPongContract, Number(latestBlock) + 1, db);
 
         const num_iters = 3;
@@ -67,9 +68,6 @@ async function main() {
                 break;
             }
         }
-    }
-    else {
-        console.log("Invalid input. Type 'ping' to trigger the Ping event.");
     }
     // Original Idea
     // pingPongContract.on("Ping", async (event) => {
