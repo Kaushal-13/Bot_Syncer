@@ -98,6 +98,13 @@ async function main() {
 }
 
 
-
-main().catch(err => console.error("Error in immediate execution:", err));
+main()
+    .then(() => {
+        console.log("Execution completed successfully.");
+        process.exit(0); // Exit with success code
+    })
+    .catch(err => {
+        console.error("Error in immediate execution:", err);
+        process.exit(1); // Exit with error code
+    });
 //  This is for cron job.
