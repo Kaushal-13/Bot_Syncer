@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "debug": "ls -R /app",
-    "run": "node scripts/getLatestBlock.js"
+    "run": "node scripts/bot.js"
   },
   "type": "module",
   "keywords": [],
