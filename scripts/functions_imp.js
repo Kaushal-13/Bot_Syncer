@@ -7,7 +7,8 @@ import { MongoClient } from 'mongodb';
 const mongoUri = process.env.MONGO_URI
 const startBlock = process.env.BLOCK_NUMBER
 const increaseGasLimit = (estimatedGasLimit) => {
-    return BigInt(estimatedGasLimit) * 130n / 100n; // Increase by 30%
+    return max(BigInt(estimatedGasLimit) * 110n / 100n, 40000n);
+    // Increase by 10% Cap at 40000
 };
 
 export async function initializeDb() {

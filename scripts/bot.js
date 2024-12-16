@@ -57,7 +57,6 @@ async function main() {
         // 
         // console.log(latestBlock)
         await getPendingPings(pingPongContract, Number(latestBlock) + 1, db);
-
         const num_iters = 3;
         for (let i = 0; i < num_iters; i++) {
             const data = await fetchPing(db);
